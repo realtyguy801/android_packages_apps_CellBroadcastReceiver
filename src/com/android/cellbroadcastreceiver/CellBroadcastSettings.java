@@ -29,6 +29,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
+import android.preference.SwitchPreference;
 import android.provider.Settings;
 import android.telephony.CarrierConfigManager;
 import android.telephony.SubscriptionManager;
@@ -125,16 +126,16 @@ public class CellBroadcastSettings extends PreferenceActivity {
      */
     public static class CellBroadcastSettingsFragment extends PreferenceFragment {
 
-        private CheckBoxPreference mExtremeCheckBox;
-        private CheckBoxPreference mSevereCheckBox;
-        private CheckBoxPreference mAmberCheckBox;
-        private CheckBoxPreference mEmergencyCheckBox;
+        private SwitchPreference mExtremeSwitch;
+        private SwitchPreference mSevereSwitch;
+        private SwitchPreference mAmberSwitch;
+        private SwitchPreference mEmergencySwitch;
         private ListPreference mReminderInterval;
-        private CheckBoxPreference mSpeechCheckBox;
-        private CheckBoxPreference mEtwsTestCheckBox;
-        private CheckBoxPreference mChannel50CheckBox;
-        private CheckBoxPreference mChannel60CheckBox;
-        private CheckBoxPreference mCmasTestCheckBox;
+        private SwitchPreference mSpeechSwitch;
+        private SwitchPreference mEtwsTestSwitch;
+        private SwitchPreference mChannel50Switch;
+        private SwitchPreference mChannel60Switch;
+        private SwitchPreference mCmasTestSwitch;
         private PreferenceCategory mAlertCategory;
         private PreferenceCategory mETWSSettingCategory;
         private boolean mDisableSevereWhenExtremeDisabled = true;
@@ -148,25 +149,25 @@ public class CellBroadcastSettings extends PreferenceActivity {
 
             PreferenceScreen preferenceScreen = getPreferenceScreen();
 
-            mExtremeCheckBox = (CheckBoxPreference)
+            mExtremeSwitch = (SwitchPreference)
                     findPreference(KEY_ENABLE_CMAS_EXTREME_THREAT_ALERTS);
-            mSevereCheckBox = (CheckBoxPreference)
+            mSevereSwitch = (SwitchPreference)
                     findPreference(KEY_ENABLE_CMAS_SEVERE_THREAT_ALERTS);
-            mAmberCheckBox = (CheckBoxPreference)
+            mAmberSwitch = (SwitchPreference)
                     findPreference(KEY_ENABLE_CMAS_AMBER_ALERTS);
-            mEmergencyCheckBox = (CheckBoxPreference)
+            mEmergencySwitch = (SwitchPreference)
                     findPreference(KEY_ENABLE_EMERGENCY_ALERTS);
             mReminderInterval = (ListPreference)
                     findPreference(KEY_ALERT_REMINDER_INTERVAL);
-            mSpeechCheckBox = (CheckBoxPreference)
+            mSpeechSwitch = (SwitchPreference)
                     findPreference(KEY_ENABLE_ALERT_SPEECH);
-            mEtwsTestCheckBox = (CheckBoxPreference)
+            mEtwsTestSwitch = (SwitchPreference)
                     findPreference(KEY_ENABLE_ETWS_TEST_ALERTS);
-            mChannel50CheckBox = (CheckBoxPreference)
+            mChannel50Switch = (SwitchPreference)
                     findPreference(KEY_ENABLE_CHANNEL_50_ALERTS);
-            mChannel60CheckBox = (CheckBoxPreference)
+            mChannel60Switch = (SwitchPreference)
                     findPreference(KEY_ENABLE_CHANNEL_60_ALERTS);
-            mCmasTestCheckBox = (CheckBoxPreference)
+            mCmasTestSwitch = (SwitchPreference)
                     findPreference(KEY_ENABLE_CMAS_TEST_ALERTS);
             mAlertCategory = (PreferenceCategory)
                     findPreference(KEY_CATEGORY_ALERT_SETTINGS);
@@ -186,9 +187,9 @@ public class CellBroadcastSettings extends PreferenceActivity {
                             if (mDisableSevereWhenExtremeDisabled) {
                                 if (pref.getKey().equals(KEY_ENABLE_CMAS_EXTREME_THREAT_ALERTS)) {
                                     boolean isExtremeAlertChecked = (Boolean)newValue;
-                                    if (mSevereCheckBox != null) {
-                                        mSevereCheckBox.setEnabled(isExtremeAlertChecked);
-                                        mSevereCheckBox.setChecked(false);
+                                    if (mSevereSwitch != null) {
+                                        mSevereSwitch.setEnabled(isExtremeAlertChecked);
+                                        mSevereSwitch.setChecked(false);
                                     }
                                 }
                             }
@@ -218,11 +219,11 @@ public class CellBroadcastSettings extends PreferenceActivity {
 
             if (enableDevSettings || showEtwsSettings || emergencyAlertOnOffOptionEnabled) {
                 // enable/disable all alerts except CMAS presidential alerts.
-                if (mEmergencyCheckBox != null) {
-                    mEmergencyCheckBox.setOnPreferenceChangeListener(startConfigServiceListener);
+                if (mEmergencySwitch != null) {
+                    mEmergencySwitch.setOnPreferenceChangeListener(startConfigServiceListener);
                 }
             } else {
-                mAlertCategory.removePreference(mEmergencyCheckBox);
+                mAlertCategory.removePreference(mEmergencySwitch);
             }
 
             // Show alert settings and ETWS categories for ETWS builds and developer mode.
@@ -237,20 +238,20 @@ public class CellBroadcastSettings extends PreferenceActivity {
 
                     // Remove CMAS test preference.
                     if (devSettingCategory != null) {
-                        devSettingCategory.removePreference(mCmasTestCheckBox);
+                        devSettingCategory.removePreference(mCmasTestSwitch);
                     }
                 }
             } else {
-                mAlertCategory.removePreference(mSpeechCheckBox);
+                mAlertCategory.removePreference(mSpeechSwitch);
                 // Remove ETWS test preference category.
                 preferenceScreen.removePreference(mETWSSettingCategory);
             }
 
             if (!res.getBoolean(R.bool.show_cmas_settings)) {
                 // Remove CMAS preference items in emergency alert category.
-                mAlertCategory.removePreference(mExtremeCheckBox);
-                mAlertCategory.removePreference(mSevereCheckBox);
-                mAlertCategory.removePreference(mAmberCheckBox);
+                mAlertCategory.removePreference(mExtremeSwitch);
+                mAlertCategory.removePreference(mSevereSwitch);
+                mAlertCategory.removePreference(mAmberSwitch);
             }
 
             TelephonyManager tm = (TelephonyManager) getContext().getSystemService(
@@ -298,34 +299,34 @@ public class CellBroadcastSettings extends PreferenceActivity {
                 preferenceScreen.removePreference(findPreference(KEY_CATEGORY_DEV_SETTINGS));
             }
 
-            if (mChannel50CheckBox != null) {
-                mChannel50CheckBox.setOnPreferenceChangeListener(startConfigServiceListener);
+            if (mChannel50Switch != null) {
+                mChannel50Switch.setOnPreferenceChangeListener(startConfigServiceListener);
             }
 
-            if (mChannel60CheckBox != null) {
-                mChannel60CheckBox.setOnPreferenceChangeListener(startConfigServiceListener);
+            if (mChannel60Switch != null) {
+                mChannel60Switch.setOnPreferenceChangeListener(startConfigServiceListener);
             }
 
-            if (mEtwsTestCheckBox != null) {
-                mEtwsTestCheckBox.setOnPreferenceChangeListener(startConfigServiceListener);
+            if (mEtwsTestSwitch != null) {
+                mEtwsTestSwitch.setOnPreferenceChangeListener(startConfigServiceListener);
             }
-            if (mExtremeCheckBox != null) {
-                mExtremeCheckBox.setOnPreferenceChangeListener(startConfigServiceListener);
+            if (mExtremeSwitch != null) {
+                mExtremeSwitch.setOnPreferenceChangeListener(startConfigServiceListener);
             }
 
-            if (mSevereCheckBox != null) {
-                mSevereCheckBox.setOnPreferenceChangeListener(startConfigServiceListener);
+            if (mSevereSwitch != null) {
+                mSevereSwitch.setOnPreferenceChangeListener(startConfigServiceListener);
                 if (mDisableSevereWhenExtremeDisabled) {
-                    if (mExtremeCheckBox != null) {
-                        mSevereCheckBox.setEnabled(mExtremeCheckBox.isChecked());
+                    if (mExtremeSwitch != null) {
+                        mSevereSwitch.setEnabled(mExtremeSwitch.isChecked());
                     }
                 }
             }
-            if (mAmberCheckBox != null) {
-                mAmberCheckBox.setOnPreferenceChangeListener(startConfigServiceListener);
+            if (mAmberSwitch != null) {
+                mAmberSwitch.setOnPreferenceChangeListener(startConfigServiceListener);
             }
-            if (mCmasTestCheckBox != null) {
-                mCmasTestCheckBox.setOnPreferenceChangeListener(startConfigServiceListener);
+            if (mCmasTestSwitch != null) {
+                mCmasTestSwitch.setOnPreferenceChangeListener(startConfigServiceListener);
             }
         }
 

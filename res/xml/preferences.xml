@@ -22,6 +22,12 @@
     <PreferenceCategory android:title="@string/emergency_alert_settings_title"
                         android:key="category_alert_settings">
 
+        <!-- Enable presidential alerts -->
+        <SwitchPreference android:defaultValue="true"
+                            android:key="enable_cmas_presidential_alerts"
+                            android:summary="@string/enable_cmas_presidential_alerts_summary"
+                            android:title="@string/enable_cmas_presidential_alerts_title" />
+
         <!-- Enable CMAS Extreme Threat alerts -->
         <SwitchPreference android:defaultValue="true"
                             android:key="enable_cmas_extreme_threat_alerts"
@@ -51,6 +57,11 @@
                         android:entryValues="@array/alert_reminder_interval_values"
                         android:defaultValue="@string/alert_reminder_interval_default_value"
                         android:dialogTitle="@string/alert_reminder_interval_title" />
+
+        <SwitchPreference android:defaultValue="true"
+                            android:key="enable_alert_tone"
+                            android:summary="@string/enable_alert_tone_summary"
+                            android:title="@string/enable_alert_tone_title" />
 
         <SwitchPreference android:defaultValue="true"
                             android:key="enable_alert_vibrate"
@@ -92,7 +103,8 @@
     <PreferenceCategory android:title="@string/category_india_settings_title"
                         android:key="category_india_settings">
 
-        <SwitchPreference android:key="enable_channel_60_alerts"
+        <SwitchPreference android:defaultValue="@bool/def_channel_60_enabled"
+                            android:key="enable_channel_60_alerts"
                             android:summary="@string/enable_channel_60_alerts_summary"
                             android:title="@string/enable_channel_60_alerts_title" />
 

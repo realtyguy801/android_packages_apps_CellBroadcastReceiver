@@ -34,7 +34,7 @@ import com.android.internal.telephony.gsm.SmsCbConstants;
 
 import java.util.ArrayList;
 
-import static com.android.cellbroadcastreceiver.CellBroadcastReceiver.DBG;
+import static com.android.cellbroadcastreceiver.CellBroadcastReceiver.VDBG;
 
 /**
  * This service manages enabling and disabling ranges of message identifiers
@@ -178,7 +178,8 @@ public class CellBroadcastConfigService extends IntentService {
                 COUNTRY_INDIA.equals(country);
 
         boolean enableChannel50Alerts = enableChannel50Support &&
-                prefs.getBoolean(CellBroadcastSettings.KEY_ENABLE_CHANNEL_50_ALERTS, true);
+                prefs.getBoolean(CellBroadcastSettings.KEY_ENABLE_CHANNEL_50_ALERTS, 
+                getResources().getBoolean(R.bool.def_channel_50_enabled));
 
         boolean enableChannel60Support = res.getBoolean(R.bool.show_india_settings) ||
                 COUNTRY_INDIA.equals(country);
@@ -194,7 +195,7 @@ public class CellBroadcastConfigService extends IntentService {
         boolean supportTaiwanPwsAlerts = (COUNTRY_TAIWAN.equals(tm.getSimCountryIso(subId))
                 || COUNTRY_TAIWAN.equals(tm.getNetworkCountryIso(subId)));
 
-        if (DBG) {
+        if (VDBG) {
             log("enableEmergencyAlerts = " + enableEmergencyAlerts);
             log("enableEtwsAlerts = " + enableEtwsAlerts);
             log("enablePresidential = " + enablePresidential);
@@ -327,7 +328,7 @@ public class CellBroadcastConfigService extends IntentService {
                 SmsCbConstants.MESSAGE_ID_CMAS_ALERT_REQUIRED_MONTHLY_TEST_LANGUAGE,
                 SmsCbConstants.MESSAGE_ID_CMAS_ALERT_OPERATOR_DEFINED_USE_LANGUAGE);
 
-        // Enable/Disable channel 50 messages for Brazil/India.
+        // Enable/Disable channel 50 messages for Brazil (50).
         setCellBroadcastRange(manager, enableChannel50Alerts,
                 SmsManager.CELL_BROADCAST_RAN_TYPE_GSM,
                 SmsCbConstants.MESSAGE_ID_GSMA_ALLOCATED_CHANNEL_50,

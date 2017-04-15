@@ -18,6 +18,8 @@ package com.android.cellbroadcastreceiver;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.SharedPreferences;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -28,6 +30,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.provider.Settings;
@@ -45,11 +48,16 @@ public class CellBroadcastSettings extends PreferenceActivity {
 
     private static final boolean DBG = false;
 
+    public static final String ALERT_SOUND_DEFAULT_DURATION = "4";
+    public static final String KEY_ALERT_SOUND_DURATION = "alert_sound_duration";
+
     // Preference key for whether to enable emergency notifications (default enabled).
     public static final String KEY_ENABLE_EMERGENCY_ALERTS = "enable_emergency_alerts";
 
     // Enable vibration on alert (unless master volume is silent).
     public static final String KEY_ENABLE_ALERT_VIBRATE = "enable_alert_vibrate";
+
+    public static final String KEY_ENABLE_ALERT_TONE = "enable_alert_tone";
 
     // Speak contents of alert after playing the alert sound.
     public static final String KEY_ENABLE_ALERT_SPEECH = "enable_alert_speech";
@@ -94,11 +102,19 @@ public class CellBroadcastSettings extends PreferenceActivity {
     // Enabled by default for phones sold in India, otherwise this setting may be hidden.
     public static final String KEY_ENABLE_CHANNEL_60_ALERTS = "enable_channel_60_alerts";
 
+   // Customize the channel to enable
+    public static final String KEY_ENABLE_CHANNELS_ALERTS = "enable_channels_alerts";
+    public static final String KEY_DISABLE_CHANNELS_ALERTS = "disable_channels_alerts";
+
     // Preference key for initial opt-in/opt-out dialog.
     public static final String KEY_SHOW_CMAS_OPT_OUT_DIALOG = "show_cmas_opt_out_dialog";
 
     // Alert reminder interval ("once" = single 2 minute reminder).
     public static final String KEY_ALERT_REMINDER_INTERVAL = "alert_reminder_interval";
+
+    // Whether to display CMAS preidential alerts (default is enabled).
+    public static final String KEY_ENABLE_PRESIDENTIAL_ALERTS =
+            "enable_cmas_presidential_alerts";
 
     // Brazil country code
     private static final String COUNTRY_BRAZIL = "br";
@@ -106,13 +122,26 @@ public class CellBroadcastSettings extends PreferenceActivity {
     // India country code
     private static final String COUNTRY_INDIA = "in";
 
+    private static SwitchPreference mPresidentialSwitch;
+    private static SwitchPreference mEnableAlertsTone;
+    private static SharedPreferences prefs;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        prefs = PreferenceManager
+            .getDefaultSharedPreferences(this);
         UserManager userManager = (UserManager) getSystemService(Context.USER_SERVICE);
         if (userManager.hasUserRestriction(UserManager.DISALLOW_CONFIG_CELL_BROADCASTS)) {
             setContentView(R.layout.cell_broadcast_disallowed_preference_screen);
+            return;
+        }
+
+        if (getResources().getBoolean(R.bool.def_custome_cell_broadcast_layout)) {
+            Intent intent = new Intent();
+            intent.setClass(this, CustomCellBroadcastSettingsActivity.class);
+            startActivity(intent);
+            this.finish();
             return;
         }
 
@@ -138,6 +167,7 @@ public class CellBroadcastSettings extends PreferenceActivity {
         private SwitchPreference mCmasTestSwitch;
         private PreferenceCategory mAlertCategory;
         private PreferenceCategory mETWSSettingCategory;
+        private PreferenceCategory mDEVSettingCategory;
         private boolean mDisableSevereWhenExtremeDisabled = true;
 
         @Override
@@ -149,6 +179,8 @@ public class CellBroadcastSettings extends PreferenceActivity {
 
             PreferenceScreen preferenceScreen = getPreferenceScreen();
 
+            mPresidentialSwitch = (SwitchPreference)
+                    findPreference(KEY_ENABLE_PRESIDENTIAL_ALERTS);
             mExtremeSwitch = (SwitchPreference)
                     findPreference(KEY_ENABLE_CMAS_EXTREME_THREAT_ALERTS);
             mSevereSwitch = (SwitchPreference)
@@ -173,6 +205,18 @@ public class CellBroadcastSettings extends PreferenceActivity {
                     findPreference(KEY_CATEGORY_ALERT_SETTINGS);
             mETWSSettingCategory = (PreferenceCategory)
                     findPreference(KEY_CATEGORY_ETWS_SETTINGS);
+            mDEVSettingCategory = (PreferenceCategory)
+                    findPreference(KEY_CATEGORY_DEV_SETTINGS);
+
+            if (getResources().getBoolean(
+                        R.bool.config_regional_wea_alert_tone_enable)) {
+                mEnableAlertsTone =
+                    (SwitchPreference) findPreference(KEY_ENABLE_ALERT_TONE);
+                mEnableAlertsTone.setChecked(prefs.getBoolean(
+                        KEY_ENABLE_ALERT_TONE, true));
+            } else {
+                preferenceScreen.removePreference(findPreference(KEY_ENABLE_ALERT_TONE));
+            }
 
             mDisableSevereWhenExtremeDisabled = isFeatureEnabled(getContext(),
                     CarrierConfigManager.KEY_DISABLE_SEVERE_WHEN_EXTREME_DISABLED_BOOL, true);
@@ -257,6 +301,20 @@ public class CellBroadcastSettings extends PreferenceActivity {
             TelephonyManager tm = (TelephonyManager) getContext().getSystemService(
                     Context.TELEPHONY_SERVICE);
 
+            if (getResources().getBoolean(
+                    R.bool.config_regional_wea_rm_turn_on_notification)) {
+                if (findPreference(KEY_ENABLE_EMERGENCY_ALERTS) != null) {
+                    mAlertCategory.removePreference(findPreference(KEY_ENABLE_EMERGENCY_ALERTS));
+                }
+            }
+
+            if (getResources().getBoolean(
+                    R.bool.config_regional_wea_rm_alert_reminder)) {
+                if (findPreference(KEY_ALERT_REMINDER_INTERVAL) != null) {
+                    mAlertCategory.removePreference(findPreference(KEY_ALERT_REMINDER_INTERVAL));
+                }
+            }
+
             // We display channel 50 enable/disable menu if one of the followings is true
             // 1. The setting through resource overlay is set to true.
             // 2. At least one SIM inserted is Brazilian SIM.
@@ -279,17 +337,13 @@ public class CellBroadcastSettings extends PreferenceActivity {
                 preferenceScreen.removePreference(findPreference(KEY_CATEGORY_BRAZIL_SETTINGS));
             }
 
-            boolean enableChannel60Support = res.getBoolean(R.bool.show_india_settings);
-
-            if (!enableChannel60Support) {
-                SubscriptionManager sm = SubscriptionManager.from(getContext());
-                for (int subId : sm.getActiveSubscriptionIdList()) {
-                    if (COUNTRY_INDIA.equals(tm.getSimCountryIso(subId))) {
-                        enableChannel60Support = true;
-                        break;
-                    }
-                }
+            int subId = SubscriptionManager.getDefaultSmsSubscriptionId();
+            if (subId == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
+                subId = SubscriptionManager.getDefaultSubscriptionId();
             }
+
+            boolean enableChannel60Support = res.getBoolean(R.bool.show_india_settings) ||
+                    COUNTRY_INDIA.equals(tm.getSimCountryIso(subId));
 
             if (!enableChannel60Support) {
                 preferenceScreen.removePreference(findPreference(KEY_CATEGORY_INDIA_SETTINGS));
@@ -327,6 +381,40 @@ public class CellBroadcastSettings extends PreferenceActivity {
             }
             if (mCmasTestSwitch != null) {
                 mCmasTestSwitch.setOnPreferenceChangeListener(startConfigServiceListener);
+            }
+           if (getResources().getBoolean(R.bool.config_regional_wea_show_presidential_alert) &&
+                   mPresidentialSwitch != null) {
+               //Presidential Alerts should be always allowed.
+               //Hence the option should be greyed out.
+               mPresidentialSwitch.setChecked(true);
+               mPresidentialSwitch.setEnabled(false);
+           } else {
+               preferenceScreen.removePreference(mPresidentialSwitch);
+           }
+
+            if (getResources().getBoolean(
+                    R.bool.config_regional_wea_alert_tone_enable)
+                    && mEnableAlertsTone != null) {
+                mEnableAlertsTone.setOnPreferenceChangeListener(
+                        new Preference.OnPreferenceChangeListener() {
+                            @Override
+                            public boolean onPreferenceChange(Preference pref, Object newValue) {
+                                SharedPreferences.Editor editor = prefs.edit();
+                                String value = String.valueOf(newValue);
+                                editor.putBoolean(KEY_ENABLE_ALERT_TONE,
+                                    Boolean.valueOf((value)));
+                                return true;
+                            }
+                        });
+            }
+            if (mETWSSettingCategory != null && getResources().getBoolean(
+                    R.bool.config_disable_etws_cellbroadcast_settings)) {
+                preferenceScreen.removePreference(mETWSSettingCategory);
+            }
+
+            if (mDEVSettingCategory != null && getResources().getBoolean(
+                    R.bool.config_disable_dev_cellbroadcast_settings)) {
+                preferenceScreen.removePreference(mDEVSettingCategory);
             }
         }
 

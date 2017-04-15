@@ -21,5 +21,21 @@
   <!-- Preference title for enable channel 60 alerts. [CHAR LIMIT=30] -->
   <string name="enable_channel_60_alerts_title">Pokaż 60 kanał transmisji</string>
   <!-- Preference summary for enable channel 60 alerts. [CHAR LIMIT=100] -->
-  <string name="enable_channel_60_alerts_summary">Kanał 60 jest używany w Indiach dla konkretnych informacji Operatora</string>
+  <!-- Preference title for presidential Alerts checkbox. [CHAR LIMIT=30] -->
+  <!-- Preference summary for presidential Alerts checkbox. [CHAR LIMIT=100] -->
+  <string name="enable_alert_tone_summary">Sygnał dźwiękowy włączony</string>
+  <!-- set cellbroadcast enable or disable, default value is true-->
+  <string name="cb_channel_dialog_channel_name">Nazwa kanału (0-10 znaków)</string>
+  <string name="cb_channel_dialog_channel_number">Numer kanału (0–65534)</string>
+  <string name="cb_channel_dialog_channel_state">Aktywuj kanał</string>
+  <string name="cb_error_channel_num">Proszę wprowadzić numer kanału (0-65534).</string>
+  <string name="cb_menu_channel_list">Lista kanałów</string>
+  <string name="cb_menu_edit">Edytuj</string>
+  <string name="error_finish_dialog_title">Błąd sieci lub karty SIM.</string>
+  <string name="close_dialog">OK</string>
+  <string name="updating_title">Ustawienia połączeń</string>
+  <string name="done_text">Gotowe</string>
+  <!-- CellBroadcast channel 50 enabled or not,default value is true -->
+  <!-- Customize 50 into filter list -->
+  <string name="cb_channel_50_name">Kanał 50</string>
 </resources>

@@ -21,5 +21,20 @@
   <!-- Preference title for enable channel 60 alerts. [CHAR LIMIT=30] -->
   <string name="enable_channel_60_alerts_title">Visa sändningar för kanal 60</string>
   <!-- Preference summary for enable channel 60 alerts. [CHAR LIMIT=100] -->
-  <string name="enable_channel_60_alerts_summary">Kanal 60 används i Indien för specifik information från leverantören</string>
+  <!-- Preference title for presidential Alerts checkbox. [CHAR LIMIT=30] -->
+  <!-- Preference summary for presidential Alerts checkbox. [CHAR LIMIT=100] -->
+  <string name="enable_alert_tone_title">Varningston</string>
+  <!-- set cellbroadcast enable or disable, default value is true-->
+  <string name="cb_channel_dialog_channel_name">Kanalnamn (0-10 tecken)</string>
+  <string name="cb_channel_dialog_channel_number">Kanalnummer (0-65534)</string>
+  <string name="cb_channel_dialog_channel_state">Aktivera kanalen</string>
+  <string name="cb_error_channel_num">Ange kanal number (0-65534).</string>
+  <string name="cb_menu_add_channel">Lägg till kanal</string>
+  <string name="cb_menu_channel_list">Kanallista</string>
+  <string name="enable">Aktivera</string>
+  <string name="disable">Avaktivera</string>
+  <string name="cb_menu_edit">Redigera</string>
+  <string name="close_dialog">OK</string>
+  <!-- CellBroadcast channel 50 enabled or not,default value is true -->
+  <!-- Customize 50 into filter list -->
 </resources>
